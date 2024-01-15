@@ -1,9 +1,13 @@
+#Autor: Dominik Sidorczuk, Tomasz Sroka
 import random
 import numpy as np
 import random
 import cec2017
 
 from cec2017.functions import f1
+
+from typing import Tuple
+from environment_base import Environment
 
 
 UPPER_BOUND = 100
@@ -16,25 +20,43 @@ class Point:
         if array is None:
             self.array = np.random.uniform(-UPPER_BOUND, UPPER_BOUND, size=(DIMENSIONALITY))
 
-    def mutation(self, sigma: float):
+    def mutation(self, sigma: float) -> np.array:
         self.array = np.array([gen + sigma * random.gauss(0, 1) for gen in self.array])
         return
 
     def copy(self):
         return Point(self.array[:])
+    
+    def __repr__(self):
+        return ",".join(str(gen) for gen in self.array)
 
 
-class EvolutionAlgorithm:
-    def __init__(self, population, function, population_size=1000, tournament_size=2, sigma=0.1, steps=100) -> None:
+class EvolutionAlgorithm(Environment):
+    def __init__(self, population, function, tournament_size=2, sigma=0.1, steps=100) -> None:
         self.population = population
-        self.population_size = population_size
+        self._population_size = len(population) 
         self.tournament_size = tournament_size
-        self.sigma = sigma
+        self._sigma = sigma
         self.steps = steps
         self.func = function
-        self.mean, self.std = self.mean_and_deviation()
 
-    def eval_func(self, point: Point):
+    @property
+    def population_size(self):
+        return self._population_size
+
+    @population_size.setter
+    def population_size(self,value):
+        self._population_size==min(0,value)
+
+    @property
+    def sigma(self):
+        return self._sigma
+
+    @sigma.setter
+    def sigma(self,value):
+        self._sigma=min(0,value)
+
+    def eval_func(self, point: Point) -> np.ndarray[float]:
         return self.func(point.array)
 
     def set_new_p_size(self, delta_size, percent=0):
@@ -46,13 +68,11 @@ class EvolutionAlgorithm:
             self.population = population[:self.population_size]
         elif delta_size > 0:
             self.population = self.population + [Point() for _ in range(delta_size)]
-        return
 
     def set_new_sigma(self, delta_sigma, percent=0):
         if percent:
             delta_sigma = int(self.sigma * delta_sigma // 100)
         self.sigma = self.sigma + delta_sigma
-        return
 
     def tournament_selection(self) -> Point:
         new_points = [random.choice(self.population) for _ in range(self.tournament_size)]
@@ -69,9 +89,8 @@ class EvolutionAlgorithm:
     def mutate_all(self):
         for point in self.population:
             point.mutation(self.sigma)
-        return
 
-    def step(self):
+    def step(self) -> float:
         self.tournament_for_all()
         # można dodać krzyżowanie
         self.mutate_all()
@@ -79,7 +98,7 @@ class EvolutionAlgorithm:
         mean, std = self.mean_and_deviation()
         return mean
 
-    def mean_and_deviation(self):
+    def mean_and_deviation(self) -> Tuple[float,float]:
         array = np.array([self.eval_func(p) for p in self.population])
         mean = np.mean(array)
         std = np.std(array)
@@ -87,9 +106,3 @@ class EvolutionAlgorithm:
             
     def __str__(self):
         return f"{len(self.population)}\n{[list(point.array) for point in self.population]}"
-
-
-points = np.array([Point() for _ in range(10)])
-e = EvolutionAlgorithm(points, f1, 10, sigma=5)
-print(e.mean)
-print(e.step())
