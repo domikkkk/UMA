@@ -34,6 +34,8 @@ class QLearning_evolution:
 
         self.success_history = [False]*20 # assumes no successes at start
 
+        self.currectAction=None;
+
 
         self.Q = np.zeros((len(self.bins_std),len(self.bins_success_rate), self.actions_count))
 
@@ -50,15 +52,20 @@ class QLearning_evolution:
         return std_bin,rate_bin
     
     def get_greedy_action(self,std,rate) -> tuple[int,int]:
-        return self.index_to_action(np.argmax(self.Q[std,rate])) # greedy
+        return np.argmax(self.Q[std,rate]) # greedy
 
     def index_to_action(self,index):
-        p_idx = index//self.actions_count
-        m_idx = index%self.actions_count
+        p_idx = index//len(self.actions_P)
+        m_idx = index%len(self.actions_M)
         return p_idx,m_idx
+    
+    def action_to_index(self,p,m):
+        return p*len(self.actions_P)+m
     
     def select_action(self,std,rate) -> tuple[int,int]:
         best = self.get_greedy_action(std,rate)
+        self.currectAction=best
+        best = self.index_to_action(best)
         return self.actions_P[best[0]],self.actions_M[best[1]]
     
     def do_action(self,action_p,action_m):
@@ -72,8 +79,8 @@ class QLearning_evolution:
 
 
     
-    def update_Qvalues(self,std,rate,reward):
-        self.Q[std][rate] = (1-self.alpha)*self.Q[std][rate]+self.alpha*(reward*self.gamma+np.argmax(self.Q[std,rate]))
+    def update_Qvalues(self,std,rate,action_p,action_m,reward):
+        self.Q[std][rate][self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward*self.gamma+np.argmax(self.Q[std,rate]))
     
     def reset(self):
         # gets brand new state
@@ -101,7 +108,7 @@ class QLearning_evolution:
             reward = last_mean-mean if last_mean else 0
             print(reward)
 
-            self.update_Qvalues(idx_std,idx_rate, reward)
+            self.update_Qvalues(idx_std,idx_rate, action_p,action_m, reward)
 
             # update state
             if last_mean: self.update_successes((mean-last_mean)>0)
