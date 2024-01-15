@@ -1,7 +1,5 @@
 #Autor: Dominik Sidorczuk, Tomasz Sroka
-import random
 import numpy as np
-import random
 import cec2017
 
 from cec2017.functions import f1
@@ -21,7 +19,7 @@ class Point:
             self.array = np.random.uniform(-UPPER_BOUND, UPPER_BOUND, size=(DIMENSIONALITY))
 
     def mutation(self, sigma: float) -> np.array:
-        self.array = np.array([gen + sigma * random.gauss(0, 1) for gen in self.array])
+        self.array = np.array([gen + sigma * np.random.normal(0, 1) for gen in self.array])
         return
 
     def copy(self):
@@ -75,7 +73,7 @@ class EvolutionAlgorithm(Environment):
         self.sigma = self.sigma + delta_sigma
 
     def tournament_selection(self) -> Point:
-        new_points = [random.choice(self.population) for _ in range(self.tournament_size)]
+        new_points = [np.random.choice(self.population) for _ in range(self.tournament_size)]
         best_point = sorted(new_points, key=self.eval_func)[0].copy()
         return best_point
 

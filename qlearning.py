@@ -6,7 +6,7 @@ from environment_base import Environment
 class QLearning_evolution:
     # manages q-tables and runs experiments
 
-    def __init__(self, actions_P,actions_M, objective, state_size:tuple = (5,5), population_size=5, proportional_actions=False, alpha=0.2, gamma=0.5) -> None:
+    def __init__(self, actions_P,actions_M, objective, state_size:tuple = (5,5), population_size=5, proportional_actions=False, alpha=0.2, gamma=0.5, epsilon=0.2) -> None:
         """
         actions_P - valid actions for population state
         actions_M - valid actions for mutation strength state
@@ -31,10 +31,11 @@ class QLearning_evolution:
 
         self.alpha = alpha
         self.gamma = gamma
+        self.epsilon = epsilon
 
         self.success_history = [False]*20 # assumes no successes at start
 
-        self.currectAction=None;
+        self.currectAction=None
 
 
         self.Q = np.zeros((len(self.bins_std),len(self.bins_success_rate), self.actions_count))
@@ -53,6 +54,9 @@ class QLearning_evolution:
     
     def get_greedy_action(self,std,rate) -> tuple[int,int]:
         return np.argmax(self.Q[std,rate]) # greedy
+    
+    def get_random_action(self):
+        return np.random.choice(self.actions_count) # greedy
 
     def index_to_action(self,index):
         p_idx = index//len(self.actions_P)
@@ -63,13 +67,15 @@ class QLearning_evolution:
         return p*len(self.actions_P)+m
     
     def select_action(self,std,rate) -> tuple[int,int]:
-        best = self.get_greedy_action(std,rate)
-        self.currectAction=best
-        best = self.index_to_action(best)
-        return self.actions_P[best[0]],self.actions_M[best[1]]
+        if np.random.random()>self.epsilon:
+            self.currectAction = self.get_greedy_action(std,rate)
+        else:
+            self.currectAction = self.get_random_action()
+        act = self.index_to_action(self.currectAction)
+        return self.actions_P[act[0]],self.actions_M[act[1]]
     
     def do_action(self,action_p,action_m):
-        print(f"actions: ",action_p,action_m)
+        #print(f"actions: ",action_p,action_m)
         if self.proportional:
             self._env.population_size*=action_p
             self._env.sigma*=action_m
@@ -82,33 +88,38 @@ class QLearning_evolution:
     def update_Qvalues(self,std,rate,action_p,action_m,reward):
         self.Q[std][rate][self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward*self.gamma+np.argmax(self.Q[std,rate]))
     
-    def reset(self):
+    def reset(self, seed=None):
+        if seed:
+            np.random.seed(seed)
         # gets brand new state
         self.population = np.array([Point() for _ in range(self.psize)])
         self._env=EvolutionAlgorithm(self.population,self.objective)
         self.success_history = [False]*20 # assumes no successes at start
 
 
-    def episode(self, steps=250):
+    def episode(self, steps=25, learn=True):
         # calls step() method of evolution class, and based on state picks actions:
         last_mean = None
         for step in range(steps):
-            print(f"s{step}")
-            self._env.step()
             # read current state
             mean,std = self._env.mean_and_deviation()
             rate = sum(self.success_history)/len(self.success_history)
             idx_std,idx_rate = self.bin_state(std,rate)
 
             action_p,action_m = self.select_action(idx_std,idx_rate)
-
             self.do_action(action_p,action_m)
+
+            #print(f"s{step}")
+            self._env.step()
+
             # read new state
             mean,std = self._env.mean_and_deviation()
+            #print(mean)
             reward = last_mean-mean if last_mean else 0
-            print(reward)
+            #print(reward)
 
-            self.update_Qvalues(idx_std,idx_rate, action_p,action_m, reward)
+            if learn:
+                self.update_Qvalues(idx_std,idx_rate, action_p,action_m, reward)
 
             # update state
             if last_mean: self.update_successes((mean-last_mean)>0)
