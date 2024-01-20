@@ -6,7 +6,7 @@ from environment_base import Environment
 class QLearning_evolution:
     # manages q-tables and runs experiments
 
-    def __init__(self, actions_P,actions_M, objective, state_size:tuple = (5,5), population_size=5, proportional_actions=False, alpha=0.2, gamma=0.5, epsilon=0.2) -> None:
+    def __init__(self, actions_P,actions_M, objective, state_size:tuple = (5,5), population_size=5, proportional_actions=False, alpha=0.2, gamma=0.5, epsilon=0.2, epsilon_min=0, epsilon_decay=0.99) -> None:
         """
         actions_P - valid actions for population state
         actions_M - valid actions for mutation strength state
@@ -33,8 +33,8 @@ class QLearning_evolution:
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
-
-        self.success_history = [False]*20 # assumes no successes at start
+        self.epsilon_min = epsilon_min
+        self.epsilon_decay=epsilon_decay
 
         self.currectAction=None
 
@@ -49,9 +49,12 @@ class QLearning_evolution:
         self.success_history = [success]+self.success_history
 
     def bin_state(self,std,success_rate):
-        #digitize returns 0 for values under first bin, and len(bins) when over last
-        std_bin = np.digitize(std,self.bins_std)-1
-        rate_bin = np.digitize(success_rate,self.bins_success_rate)-1
+        # digitize returns 0 for values under first bin, and len(bins) when over last
+        # so return digitize-1, because deviation and rate can't be negative
+        # and put all overflowing values to highest bin to prevent errors
+        # (better to set correct bin sizes...)
+        std_bin = min(np.digitize(std,self.bins_std)-1,len(self.bins_std)-2)
+        rate_bin = min(np.digitize(success_rate,self.bins_success_rate)-1,len(self.bins_success_rate)-2)
         return std_bin,rate_bin
     
     def get_greedy_action(self,std,rate) -> tuple[int,int]:
@@ -62,7 +65,7 @@ class QLearning_evolution:
         return np.random.choice(self.actions_count) # greedy
 
     def index_to_action(self,index):
-        p_idx = index//len(self.actions_P)
+        p_idx = index//len(self.actions_M)
         m_idx = index%len(self.actions_M)
         return p_idx,m_idx
     
@@ -100,7 +103,7 @@ class QLearning_evolution:
         # gets brand new state
         self.population = np.array([Point() for _ in range(self.psize)])
         self._env=EvolutionAlgorithm(self.population,self.objective)
-        self.success_history = [False]*20 # assumes no successes at start
+        self.success_history = [True]*20 # assumes all successes at start
 
 
     def episode(self, steps=25, learn=True):
@@ -128,16 +131,19 @@ class QLearning_evolution:
                 self.update_Qvalues(idx_std,idx_rate, action_p,action_m, reward)
 
             # update state
-            if last_mean: self.update_successes((mean-last_mean)>0)
+            if last_mean: self.update_successes((mean-last_mean)<0)
             last_mean=mean
 
-    def fit(self, episodes = 10):
+    def fit(self, episodes = 10, steps_per_episode=25):
         for ep in range(episodes):
             self.reset()
-            self.episode()
+            self.episode(steps_per_episode)
+            self.epsilon = max(self.epsilon_min,self.epsilon*self.epsilon_decay)
+            # debug
             print(ep,self._env.mean_and_deviation())
             print("Q:")
             print(self.Q[:,:,:])
+            print("eps:",self.epsilon)
 
 
 
