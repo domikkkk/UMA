@@ -30,12 +30,11 @@ class Point:
 
 
 class EvolutionAlgorithm(Environment):
-    def __init__(self, population, function, tournament_size=2, sigma=0.1, steps=100) -> None:
+    def __init__(self, population, function, tournament_size=2, sigma=0.1) -> None:
         self.population = population
         self._population_size = len(population) 
         self.tournament_size = tournament_size
         self._sigma = sigma
-        self.steps = steps
         self.func = function
 
     @property
@@ -88,13 +87,10 @@ class EvolutionAlgorithm(Environment):
         for point in self.population:
             point.mutation(self.sigma)
 
-    def step(self) -> float:
+    def step(self):
         self.tournament_for_all()
         # można dodać krzyżowanie
         self.mutate_all()
-        self.steps = self.steps - 1
-        mean, std = self.mean_and_deviation()
-        return mean
 
     def mean_and_deviation(self) -> Tuple[float,float]:
         array = np.array([self.eval_func(p) for p in self.population])

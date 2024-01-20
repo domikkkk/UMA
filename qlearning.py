@@ -6,7 +6,7 @@ from environment_base import Environment
 class QLearning_evolution:
     # manages q-tables and runs experiments
 
-    def __init__(self, actions_P,actions_M, objective, state_size:tuple = (5,5), population_size=5, proportional_actions=False, alpha=0.2, gamma=0.5, epsilon=0.2) -> None:
+    def __init__(self, actions_P, actions_M, objective, state_size:tuple = (5,5), population_size=5, proportional_actions=False, alpha=0.2, gamma=0.5, epsilon=0.2) -> None:
         """
         actions_P - valid actions for population state
         actions_M - valid actions for mutation strength state
@@ -20,8 +20,8 @@ class QLearning_evolution:
         self.objective = objective
         self.reset()
 
-        self.actions_P=actions_P
-        self.actions_M=actions_M
+        self.actions_P = actions_P
+        self.actions_M = actions_M
         self.actions_count = len(actions_P)*len(actions_M)
         self.proportional = proportional_actions
 
@@ -43,7 +43,7 @@ class QLearning_evolution:
 
     def get_environment(self) -> Environment:
         return self._env
-    
+
     def update_successes(self, success):
         self.success_history.pop()
         self.success_history = [success]+self.success_history
@@ -53,22 +53,22 @@ class QLearning_evolution:
         std_bin = np.digitize(std,self.bins_std)-1
         rate_bin = np.digitize(success_rate,self.bins_success_rate)-1
         return std_bin,rate_bin
-    
+
     def get_greedy_action(self,std,rate) -> tuple[int,int]:
         #return np.argmax(self.Q[std,rate]) # greedy
         return np.random.choice(np.flatnonzero(self.Q[std,rate] == self.Q[std,rate].max())) # random tie break
-    
+
     def get_random_action(self):
         return np.random.choice(self.actions_count) # greedy
 
     def index_to_action(self,index):
         p_idx = index//len(self.actions_P)
-        m_idx = index%len(self.actions_M)
+        m_idx = index%len(self.actions_P)
         return p_idx,m_idx
-    
+
     def action_to_index(self,p,m):
         return p*len(self.actions_P)+m
-    
+
     def select_action(self,std,rate, learn=True) -> tuple[int,int]:
         # if not learning, always select what qtable says is the best
         if learn and np.random.random()<self.epsilon:
@@ -79,7 +79,7 @@ class QLearning_evolution:
         #if not learn:
             #print("decision:",self.actions_P[act[0]],self.actions_M[act[1]])
         return self.actions_P[act[0]],self.actions_M[act[1]]
-    
+
     def do_action(self,action_p,action_m):
         #print(f"actions: ",action_p,action_m)
         if self.proportional:
@@ -89,11 +89,9 @@ class QLearning_evolution:
             self._env.population_size+=action_p
             self._env.sigma+=action_m
 
-
-    
     def update_Qvalues(self,std,rate,action_p,action_m,reward):
         self.Q[std][rate][self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward*self.gamma+np.argmax(self.Q[std,rate]))
-    
+
     def reset(self, seed=None):
         if seed:
             np.random.seed(seed)
@@ -138,6 +136,3 @@ class QLearning_evolution:
             print(ep,self._env.mean_and_deviation())
             print("Q:")
             print(self.Q[:,:,:])
-
-
-
