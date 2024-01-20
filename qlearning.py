@@ -26,7 +26,7 @@ class QLearning_evolution:
         self.proportional = proportional_actions
 
         # @TODO: make this configurable, for example nonlinear bins
-        self.bins_std=np.linspace(0,100000,state_size[0]+1)
+        self.bins_std=np.linspace(0,100,state_size[0]+1)
         self.bins_success_rate=np.linspace(0,1,state_size[1]+1)
         print("bins:",self.bins_std,self.bins_success_rate)
 

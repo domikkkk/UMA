@@ -44,7 +44,7 @@ class EvolutionAlgorithm(Environment):
 
     @population_size.setter
     def population_size(self,value):
-        self._population_size==min(0,value)
+        self._population_size=max(1,value)
 
     @property
     def sigma(self):
@@ -52,12 +52,12 @@ class EvolutionAlgorithm(Environment):
 
     @sigma.setter
     def sigma(self,value):
-        self._sigma=min(0,value)
+        self._sigma=max(0.01,value)
 
     def eval_func(self, point: Point) -> np.ndarray[float]:
         return self.func(point.array)
 
-    def set_new_p_size(self, delta_size, percent=0):
+    def set_new_p_size(self, delta_size, percent=False):
         if percent:
             delta_size = int(self.population_size * delta_size // 100)
         self.population_size = self.population_size + delta_size
@@ -67,7 +67,7 @@ class EvolutionAlgorithm(Environment):
         elif delta_size > 0:
             self.population = self.population + [Point() for _ in range(delta_size)]
 
-    def set_new_sigma(self, delta_sigma, percent=0):
+    def set_new_sigma(self, delta_sigma, percent=False):
         if percent:
             delta_sigma = int(self.sigma * delta_sigma // 100)
         self.sigma = self.sigma + delta_sigma
