@@ -26,8 +26,9 @@ class QLearning_evolution:
         self.proportional = proportional_actions
 
         # @TODO: make this configurable, for example nonlinear bins
-        self.bins_std=np.linspace(0,100000,state_size[0])
-        self.bins_success_rate=np.linspace(0,1,state_size[1])
+        self.bins_std=np.linspace(0,100000,state_size[0]+1)
+        self.bins_success_rate=np.linspace(0,1,state_size[1]+1)
+        print("bins:",self.bins_std,self.bins_success_rate)
 
         self.alpha = alpha
         self.gamma = gamma
@@ -38,7 +39,7 @@ class QLearning_evolution:
         self.currectAction=None
 
 
-        self.Q = np.zeros((len(self.bins_std),len(self.bins_success_rate), self.actions_count))
+        self.Q = np.zeros((len(self.bins_std)-1,len(self.bins_success_rate)-1, self.actions_count))
 
     def get_environment(self) -> Environment:
         return self._env
@@ -48,12 +49,14 @@ class QLearning_evolution:
         self.success_history = [success]+self.success_history
 
     def bin_state(self,std,success_rate):
-        std_bin = np.digitize(std,self.bins_std)
-        rate_bin = np.digitize(success_rate,self.bins_success_rate)
+        #digitize returns 0 for values under first bin, and len(bins) when over last
+        std_bin = np.digitize(std,self.bins_std)-1
+        rate_bin = np.digitize(success_rate,self.bins_success_rate)-1
         return std_bin,rate_bin
     
     def get_greedy_action(self,std,rate) -> tuple[int,int]:
-        return np.argmax(self.Q[std,rate]) # greedy
+        #return np.argmax(self.Q[std,rate]) # greedy
+        return np.random.choice(np.flatnonzero(self.Q[std,rate] == self.Q[std,rate].max())) # random tie break
     
     def get_random_action(self):
         return np.random.choice(self.actions_count) # greedy
@@ -133,6 +136,8 @@ class QLearning_evolution:
             self.reset()
             self.episode()
             print(ep,self._env.mean_and_deviation())
+            print("Q:")
+            print(self.Q[:,:,:])
 
 
 

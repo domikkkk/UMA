@@ -2,19 +2,19 @@ import qlearning
 import evolution
 import numpy as np
 
+np.set_printoptions(precision=4,suppress=True)
 
 easy = lambda x: x[0]*x[0]+x[1]*x[1]
 
 
 def main():
-    np.random.seed(5)
-    agent = qlearning.QLearning_evolution([-5,0,5],[-0.1,-0,0.1],easy, alpha=0.2,epsilon=0.5,gamma=0.1)
-    agent.fit(episodes=100)
+    np.random.seed(1)
+    agent = qlearning.QLearning_evolution([-5,0,5],[-0.1,0,0.1],easy, alpha=0.001,epsilon=0.5,gamma=0.2, state_size=(1,2), population_size=20)
+    agent.fit(episodes=1000)
 
     c = 0
     for s in range(50):
         # test results
-        print("test")
         agent.reset(seed=s)
         agent.episode(learn=False,steps=25)
         no_q=agent._env.mean_and_deviation()[0]
