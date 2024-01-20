@@ -1,6 +1,7 @@
 import qlearning
 import evolution
 import numpy as np
+from cec2017.functions import f1
 
 np.set_printoptions(precision=4,suppress=True)
 
@@ -8,8 +9,8 @@ easy = lambda x: x[0]*x[0]+x[1]*x[1]
 
 
 def main():
-    np.random.seed(1)
-    agent = qlearning.QLearning_evolution([-5,0,5],[-0.1,0,0.1],easy, alpha=0.001,epsilon=0.9,epsilon_min=0.2, epsilon_decay=0.99, gamma=0.7, state_size=(1,2), population_size=20)
+    # np.random.seed(6)
+    agent = qlearning.QLearning_evolution([-5,-3, 0,3, 5],[-0.1,0,0.1],f1, alpha=0.001,epsilon=0.9,epsilon_min=0.2, epsilon_decay=0.99, gamma=0.7, state_size=(1,2), population_size=20)
     agent.fit(episodes=250, steps_per_episode=100)
 
     c = 0

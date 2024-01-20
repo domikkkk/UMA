@@ -10,7 +10,7 @@ from environment_base import Environment
 
 
 UPPER_BOUND = 100
-DIMENSIONALITY = 2  # długość tylko 2, 10, 20, 30, 50 lub 100
+DIMENSIONALITY = 20  # długość tylko 2, 10, 20, 30, 50 lub 100
 
 
 class Point:
@@ -65,7 +65,7 @@ class EvolutionAlgorithm(Environment):
             population = sorted(self.population, key=self.eval_func)
             self.population = population[:self.population_size]
         elif delta_size > 0:
-            self.population = self.population + [Point() for _ in range(delta_size)]
+            self.population = np.concatenate((self.population, np.array([Point() for _ in range(delta_size)])))
 
     def set_new_sigma(self, delta_sigma, percent=False):
         if percent:

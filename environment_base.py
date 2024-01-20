@@ -3,7 +3,7 @@ import abc
 class Environment(abc.ABC):
 
     @abc.abstractclassmethod
-    def step():
+    def step(self):
         pass
     
     @property

@@ -65,8 +65,13 @@ class QLearning_evolution:
         return np.random.choice(self.actions_count) # greedy
 
     def index_to_action(self,index):
-        p_idx = index//len(self.actions_P)
-        m_idx = index%len(self.actions_P)
+        devider = min(len(self.actions_P), len(self.actions_M))
+        if len(self.actions_P) > len(self.actions_M):
+            p_idx = index//devider
+            m_idx = index%devider
+        else:
+            m_idx = index//devider
+            p_idx = index%devider
         return p_idx,m_idx
 
     def action_to_index(self,p,m):
