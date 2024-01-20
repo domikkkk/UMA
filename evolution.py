@@ -1,5 +1,6 @@
 #Autor: Dominik Sidorczuk, Tomasz Sroka
 import numpy as np
+import scipy.spatial
 import cec2017
 
 from cec2017.functions import f1
@@ -95,7 +96,8 @@ class EvolutionAlgorithm(Environment):
     def mean_and_deviation(self) -> Tuple[float,float]:
         array = np.array([self.eval_func(p) for p in self.population])
         mean = np.mean(array)
-        std = np.std(array)
+        array_of_coordinates = np.array(list(map(lambda p: p.array, self.population)))
+        std = np.average(scipy.spatial.distance.cdist(array_of_coordinates,array_of_coordinates))
         return mean, std
             
     def __str__(self):

@@ -57,11 +57,11 @@ class QLearning_evolution:
         rate_bin = min(np.digitize(success_rate,self.bins_success_rate)-1,len(self.bins_success_rate)-2)
         return std_bin,rate_bin
 
-    def get_greedy_action(self,std,rate) -> tuple[int,int]:
+    def get_greedy_action(self,std,rate) -> int:
         #return np.argmax(self.Q[std,rate]) # greedy
         return np.random.choice(np.flatnonzero(self.Q[std,rate] == self.Q[std,rate].max())) # random tie break
 
-    def get_random_action(self):
+    def get_random_action(self) -> int:
         return np.random.choice(self.actions_count) # greedy
 
     def index_to_action(self,index):
@@ -92,7 +92,7 @@ class QLearning_evolution:
             self._env.population_size+=action_p
             self._env.sigma+=action_m
 
-    def update_Qvalues(self,std,rate,action_p,action_m,reward):
+    def update_Qvalues(self,std,rate,reward):
         self.Q[std][rate][self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward*self.gamma+np.argmax(self.Q[std,rate]))
 
     def reset(self, seed=None):
@@ -126,7 +126,7 @@ class QLearning_evolution:
             #print(reward)
 
             if learn:
-                self.update_Qvalues(idx_std,idx_rate, action_p,action_m, reward)
+                self.update_Qvalues(idx_std,idx_rate,reward)
 
             # update state
             if last_mean: self.update_successes((mean-last_mean)<0)
