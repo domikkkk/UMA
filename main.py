@@ -7,8 +7,9 @@ easy = lambda x: x[0]*x[0]+x[1]*x[1]
 
 
 def main():
-    agent = qlearning.QLearning_evolution([-5,0,5],[-0.1,-0,0.1],easy)
-    agent.fit(episodes=500)
+    np.random.seed(5)
+    agent = qlearning.QLearning_evolution([-5,0,5],[-0.1,-0,0.1],easy, alpha=0.2,epsilon=0.5,gamma=0.1)
+    agent.fit(episodes=100)
 
     c = 0
     for s in range(50):
@@ -17,11 +18,6 @@ def main():
         agent.reset(seed=s)
         agent.episode(learn=False,steps=25)
         no_q=agent._env.mean_and_deviation()[0]
-        #print(agent._env.mean_and_deviation())
-
-        # seed test
-        agent.reset(seed=s)
-        agent.episode(learn=False,steps=25)
         #print(agent._env.mean_and_deviation())
 
         # manual steps without qlearning test

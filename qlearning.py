@@ -66,12 +66,15 @@ class QLearning_evolution:
     def action_to_index(self,p,m):
         return p*len(self.actions_P)+m
     
-    def select_action(self,std,rate) -> tuple[int,int]:
-        if np.random.random()>self.epsilon:
-            self.currectAction = self.get_greedy_action(std,rate)
-        else:
+    def select_action(self,std,rate, learn=True) -> tuple[int,int]:
+        # if not learning, always select what qtable says is the best
+        if learn and np.random.random()<self.epsilon:
             self.currectAction = self.get_random_action()
+        else:
+            self.currectAction = self.get_greedy_action(std,rate)
         act = self.index_to_action(self.currectAction)
+        #if not learn:
+            #print("decision:",self.actions_P[act[0]],self.actions_M[act[1]])
         return self.actions_P[act[0]],self.actions_M[act[1]]
     
     def do_action(self,action_p,action_m):
@@ -106,7 +109,7 @@ class QLearning_evolution:
             rate = sum(self.success_history)/len(self.success_history)
             idx_std,idx_rate = self.bin_state(std,rate)
 
-            action_p,action_m = self.select_action(idx_std,idx_rate)
+            action_p,action_m = self.select_action(idx_std,idx_rate,learn)
             self.do_action(action_p,action_m)
 
             #print(f"s{step}")
