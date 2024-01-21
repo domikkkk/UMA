@@ -57,9 +57,9 @@ class EvolutionAlgorithm(Environment):
     def eval_func(self, point: Point) -> np.ndarray[float]:
         return self.func(point.array)
 
-    def set_new_p_size(self, delta_size, percent=False):
+    def change_p_size(self, delta_size, percent=False):
         if percent:
-            delta_size = int(self.population_size * delta_size // 100)
+            delta_size = int(self.population_size * delta_size / 100)
         self.population_size = self.population_size + delta_size
         if delta_size < 0:
             population = sorted(self.population, key=self.eval_func)
@@ -67,20 +67,20 @@ class EvolutionAlgorithm(Environment):
         elif delta_size > 0:
             self.population = np.concatenate((self.population, np.array([Point() for _ in range(delta_size)])))
 
-    def set_new_sigma(self, delta_sigma, percent=False):
+    def change_sigma(self, delta_sigma, percent=False):
         if percent:
-            delta_sigma = self.sigma * delta_sigma // 100
+            delta_sigma = self.sigma * delta_sigma / 100
         self.sigma = self.sigma + delta_sigma
 
-    def tournament_selection(self) -> Point:
-        new_points = [np.random.choice(self.population) for _ in range(self.tournament_size)]
-        best_point = sorted(new_points, key=self.eval_func)[0].copy()
+    def tournament_selection(points, tournament_size,objective) -> Point:
+        new_points = [np.random.choice(points) for _ in range(tournament_size)]
+        best_point = sorted(new_points, key=objective)[0].copy()
         return best_point
 
     def tournament_for_all(self):
         new_population = np.array([])
         for _ in range(self.population_size):
-            point = self.tournament_selection()
+            point = self.tournament_selection(self.population, self.tournament_size, self.eval_func)
             new_population = np.append(new_population, point)
         self.population = np.array(new_population, copy=True)
 

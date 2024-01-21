@@ -90,8 +90,8 @@ class QLearning_evolution:
 
     def do_action(self,action_p,action_m):
         #print(f"actions: ",action_p,action_m)
-        self._env.set_new_p_size(action_p, self.proportional)
-        self._env.set_new_sigma(action_m, self.proportional)
+        self._env.change_p_size(action_p, self.proportional)
+        self._env.change_sigma(action_m, self.proportional)
 
     def update_Qvalues(self,std,rate,reward):
         self.Q[std, rate, self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward+self.gamma*np.argmax(self.Q[std,rate]))
