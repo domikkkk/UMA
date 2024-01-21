@@ -60,11 +60,6 @@ class EvolutionAlgorithm(Environment):
         if percent:
             delta_size = int(self.population_size * delta_size / 100)
         self.population_size = self.population_size + delta_size
-        if delta_size < 0:
-            population = sorted(self.population, key=self.eval_func)
-            self.population = population[:self.population_size]
-        elif delta_size > 0:
-            self.population = np.concatenate((self.population, np.array([Point() for _ in range(delta_size)])))
 
     def change_sigma(self, delta_sigma, percent=False):
         if percent:

@@ -12,7 +12,7 @@ def main():
     np.random.seed(2)
     agent = qlearning.QLearning_evolution([1,0,-1],
                                           [-0.1,0,0.1],
-                                          f3,
+                                          easy,
                                           alpha=0.01,
                                           epsilon=0.9,
                                           epsilon_min=0.3,
@@ -20,14 +20,14 @@ def main():
                                           gamma=0.6,
                                           state_size=(5,5),
                                           population_size=20)
-    agent.fit(episodes=250, steps_per_episode=100)
+    agent.fit(episodes=100, steps_per_episode=50)
 
     c = 0
     for s in range(50):
         # test results
         agent.reset(seed=s)
-        agent.episode(learn=False,steps=25, verbose=True)
         print(f"seed #{s} With Q learning:")
+        agent.episode(learn=False,steps=25, verbose=True)
         with_q=agent._env.mean_and_deviation()[0]
 
         # manual steps without qlearning test
