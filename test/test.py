@@ -1,6 +1,7 @@
 import sys
 from time import time
 import matplotlib.pyplot as plt
+import numpy as np
 
 try:
     sys.path.append('./')
@@ -12,6 +13,7 @@ from qlearning import QLearning_evolution
 
 
 def learn(functions_to_learn, actions_P, actions_M, p_size):
+    np.random.seed(2)
     Q = QLearning_evolution(actions_P,
                             actions_M,
                             None,
@@ -53,9 +55,18 @@ def test(Q: QLearning_evolution, f):
     return Q.episode(learn=False, steps=25)  # to get population_size and sigma
 
 
+def find_extremum(Q: QLearning_evolution, f):
+    Q.reset()
+    Q.episode(steps=200, learn=False)
+    population = Q._env.population
+    best_p = min(population, key=lambda p: f(p.array))
+    return f(best_p.array), best_p.array
+
+
 def savefig(func_name, P, S):
     X = range(len(P))
     plt.title(func_name)
+    plt.xlabel("Step")
     plt.ylabel("Population size")
     plt.plot(X, P)
     plt.savefig("./images/" + func_name + "_population_size.png")
@@ -63,13 +74,14 @@ def savefig(func_name, P, S):
     plt.title(func_name)
     plt.plot(X, S)
     plt.ylabel("Sigma")
+    plt.xlabel("Step")
     plt.savefig("./images/" + func_name + "_sigma.png")
     plt.close()
 
 
 if __name__=="__main__":
-    # functions_to_learn = [f28, f7, f3, f1, f5, f27, f9, f21, f25, f23]
-    functions_to_learn = [f1]
+    functions_to_learn = [f28, f7, f3, f1, f5, f27, f9, f21, f25, f23]
+    # functions_to_learn = [f1]
     actions_P = [-3, -1, 0, 1, 3]
     actions_M = [-0.1, -0.05, 0, 0.05, 0.1]
     p_size = 30
@@ -82,3 +94,4 @@ if __name__=="__main__":
             continue
         P, S = test(Q, f)
         savefig(func, P, S)
+        print(find_extremum(Q, f))
