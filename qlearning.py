@@ -117,7 +117,8 @@ class QLearning_evolution:
     def episode(self, steps=25, learn=True, verbose=False):
         # calls step() method of evolution class, and based on state picks actions:
         last_mean = None
-        for step in range(steps):
+        P, S = [], []
+        for _ in range(steps):
             # read current state
             mean,std = self._env.mean_and_deviation()
             if verbose:
@@ -139,10 +140,14 @@ class QLearning_evolution:
 
             if learn:
                 self.update_Qvalues(idx_std,idx_rate,reward)
+            else:
+                P.append(self._env.population_size)
+                S.append(self._env.sigma)
 
             # update state
             if last_mean: self.update_successes((mean-last_mean)<0)
             last_mean=mean
+        return P, S
 
     def fit(self, episodes = 10, steps_per_episode=25):
         for ep in range(episodes):
