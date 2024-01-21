@@ -10,7 +10,7 @@ from environment_base import Environment
 
 
 UPPER_BOUND = 100
-DIMENSIONALITY = 20  # długość tylko 2, 10, 20, 30, 50 lub 100
+DIMENSIONALITY = 2  # długość tylko 2, 10, 20, 30, 50 lub 100
 
 
 class Point:

@@ -94,7 +94,7 @@ class QLearning_evolution:
         self._env.set_new_sigma(action_m, self.proportional)
 
     def update_Qvalues(self,std,rate,reward):
-        self.Q[std, rate, self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward*self.gamma+np.argmax(self.Q[std,rate]))
+        self.Q[std, rate, self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward+self.gamma*np.argmax(self.Q[std,rate]))
 
     def reset(self, seed=None):
         if seed:
