@@ -10,7 +10,7 @@ from environment_base import Environment
 
 
 UPPER_BOUND = 100
-DIMENSIONALITY = 2  # długość tylko 2, 10, 20, 30, 50 lub 100
+DIMENSIONALITY = 20  # długość tylko 2, 10, 20, 30, 50 lub 100
 
 
 class Point:
@@ -72,7 +72,7 @@ class EvolutionAlgorithm(Environment):
             delta_sigma = self.sigma * delta_sigma / 100
         self.sigma = self.sigma + delta_sigma
 
-    def tournament_selection(points, tournament_size,objective) -> Point:
+    def tournament_selection(self, points, tournament_size, objective) -> Point:
         new_points = [np.random.choice(points) for _ in range(tournament_size)]
         best_point = sorted(new_points, key=objective)[0].copy()
         return best_point
