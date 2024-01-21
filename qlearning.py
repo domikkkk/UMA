@@ -94,7 +94,7 @@ class QLearning_evolution:
         self._env.set_new_sigma(action_m, self.proportional)
 
     def update_Qvalues(self,std,rate,reward):
-        self.Q[std, rate, self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward*self.gamma+np.argmax(self.Q[std,rate]))
+        self.Q[std, rate, self.currectAction] = (1-self.alpha)*self.Q[std][rate][self.currectAction]+self.alpha*(reward+self.gamma*np.argmax(self.Q[std,rate]))
 
     def reset(self, seed=None):
         if seed:
@@ -103,6 +103,15 @@ class QLearning_evolution:
         self.population = np.array([Point() for _ in range(self.psize)])
         self._env=EvolutionAlgorithm(self.population,self.objective)
         self.success_history = [True]*20 # assumes all successes at start
+
+    def describe_Q_table(self):
+        # for debug purposes
+        print("Q:")
+        for i_dist,dist in enumerate(self.bins_std[:-1]):
+            for i_rate,rate in enumerate(self.bins_success_rate[:-1]):
+                print(f"dist state:[{dist},{self.bins_std[i_dist+1]})\nsuccesses state:[{rate}-{self.bins_success_rate[i_rate+1]})\n",self.Q[i_dist,i_rate,:])
+                print("-------")
+
 
 
     def episode(self, steps=25, learn=True):
@@ -141,6 +150,5 @@ class QLearning_evolution:
             self.epsilon = max(self.epsilon_min,self.epsilon*self.epsilon_decay)
             # debug
             print(ep,self._env.mean_and_deviation())
-            print("Q:")
-            print(self.Q[:,:,:])
+            self.describe_Q_table()
             print("eps:",self.epsilon)
