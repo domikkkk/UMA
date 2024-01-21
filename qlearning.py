@@ -104,6 +104,15 @@ class QLearning_evolution:
         self._env=EvolutionAlgorithm(self.population,self.objective)
         self.success_history = [True]*20 # assumes all successes at start
 
+    def describe_Q_table(self):
+        # for debug purposes
+        print("Q:")
+        for i_dist,dist in enumerate(self.bins_std[:-1]):
+            for i_rate,rate in enumerate(self.bins_success_rate[:-1]):
+                print(f"dist state:[{dist},{self.bins_std[i_dist+1]})\nsuccesses state:[{rate}-{self.bins_success_rate[i_rate+1]})\n",self.Q[i_dist,i_rate,:])
+                print("-------")
+
+
 
     def episode(self, steps=25, learn=True):
         # calls step() method of evolution class, and based on state picks actions:
@@ -141,6 +150,5 @@ class QLearning_evolution:
             self.epsilon = max(self.epsilon_min,self.epsilon*self.epsilon_decay)
             # debug
             print(ep,self._env.mean_and_deviation())
-            print("Q:")
-            print(self.Q[:,:,:])
+            self.describe_Q_table()
             print("eps:",self.epsilon)

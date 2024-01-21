@@ -9,20 +9,18 @@ easy = lambda x: x[0]*x[0]+x[1]*x[1]
 
 
 def main():
-    # np.random.seed(1)
-    agent = qlearning.QLearning_evolution([-3,-1, 0,1, 3],
+    np.random.seed(1)
+    agent = qlearning.QLearning_evolution([-1,0,1],
                                           [-0.1,0,0.1],
-                                          f3,
-                                          alpha=0.1,
+                                          easy,
+                                          alpha=0.00001,
                                           epsilon=0.9,
                                           epsilon_min=0.2,
                                           epsilon_decay=0.99,
-                                          gamma=0.5,
+                                          gamma=0.6,
                                           state_size=(1,2),
-                                          population_size=30)
-    agent.fit(episodes=250, steps_per_episode=100)
-    agent.objective = f5
-    agent.fit(episodes=250, steps_per_episode=100)
+                                          population_size=20)
+    agent.fit(episodes=100, steps_per_episode=100)
 
     c = 0
     for s in range(50):
