@@ -69,7 +69,7 @@ class EvolutionAlgorithm(Environment):
 
     def set_new_sigma(self, delta_sigma, percent=False):
         if percent:
-            delta_sigma = int(self.sigma * delta_sigma // 100)
+            delta_sigma = self.sigma * delta_sigma // 100
         self.sigma = self.sigma + delta_sigma
 
     def tournament_selection(self) -> Point:
