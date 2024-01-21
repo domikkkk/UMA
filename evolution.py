@@ -1,7 +1,6 @@
 #Autor: Dominik Sidorczuk, Tomasz Sroka
 import numpy as np
-import scipy.spatial
-import cec2017
+import scipy.spatial as ssp
 
 from cec2017.functions import f1
 
@@ -97,7 +96,7 @@ class EvolutionAlgorithm(Environment):
         array = np.array([self.eval_func(p) for p in self.population])
         mean = np.mean(array)
         array_of_coordinates = np.array(list(map(lambda p: p.array, self.population)))
-        std = np.average(scipy.spatial.distance.cdist(array_of_coordinates,array_of_coordinates))
+        std = np.average(ssp.distance.cdist(array_of_coordinates,array_of_coordinates))
         return mean, std
             
     def __str__(self):
