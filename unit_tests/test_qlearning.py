@@ -17,3 +17,9 @@ def test_state_binning():
     dist_bin,rate_bin = agent.bin_state(12345,1)
     assert dist_bin==3
     assert rate_bin==2
+
+# this test is needed because we decided on single Q-table,
+# so it requires some clever mapping between bin indices and
+# continuous NxM array
+def test_action_index_mapping():
+    

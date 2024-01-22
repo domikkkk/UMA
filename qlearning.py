@@ -157,5 +157,5 @@ class QLearning_evolution:
             self.epsilon = max(self.epsilon_min,self.epsilon*self.epsilon_decay)
             # debug
             print(ep,self._env.mean_and_deviation())
-            # self.describe_Q_table()
+            self.describe_Q_table()
             print("eps:",self.epsilon)
