@@ -1,3 +1,5 @@
+#Autor: Dominik Sidorczuk, Tomasz Sroka
+
 from evolution import EvolutionAlgorithm, Point 
 
 f = lambda x: 0 # anything

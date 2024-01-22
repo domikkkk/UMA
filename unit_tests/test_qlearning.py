@@ -1,3 +1,5 @@
+#Autor: Dominik Sidorczuk, Tomasz Sroka
+
 from qlearning import QLearning_evolution
 import numpy as np
 

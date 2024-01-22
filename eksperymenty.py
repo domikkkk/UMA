@@ -1,3 +1,5 @@
+#Autor: Dominik Sidorczuk, Tomasz Sroka
+
 import sys
 from time import time
 import matplotlib.pyplot as plt
@@ -17,7 +19,7 @@ def learn(functions_to_learn, actions_P, actions_M, p_size):
     Q = QLearning_evolution(actions_P,
                             actions_M,
                             None,
-                            alpha=0.01,
+                            alpha=0.1,
                             epsilon=0.9,
                             epsilon_min=0.2,
                             epsilon_decay=0.995,
@@ -27,7 +29,7 @@ def learn(functions_to_learn, actions_P, actions_M, p_size):
     start = time()
     for f in functions_to_learn:
         Q.objective = f
-        Q.fit(episodes=200, steps_per_episode=100)
+        Q.fit(episodes=10, steps_per_episode=100)
     print("Done. Learnt in {}".format(round(time() - start, 2)))
     return Q
 
@@ -38,15 +40,15 @@ def test(Q: QLearning_evolution, f):
     for s in range(50):
         # test results
         Q.reset(seed=s)
-        print(f"seed #{s} With Q learning:")
-        Q.episode(learn=False,steps=25, verbose=True)
+        # print(f"seed #{s} With Q learning:")
+        Q.episode(learn=False,steps=25)
         with_q=Q._env.mean_and_deviation()[0]
         # manual steps without qlearning test
         Q.reset(seed=s)
-        print(f"seed #{s} just evolution:")
+        # print(f"seed #{s} just evolution:")
         for _ in range(25):
             Q._env.step()
-            print(Q._env.mean_and_deviation(), Q._env.population_size, Q._env.sigma)
+            # print(Q._env.mean_and_deviation(), Q._env.population_size, Q._env.sigma)
         no_q=Q._env.mean_and_deviation()[0]
 
         c+=1 if with_q<no_q else 0
@@ -80,9 +82,9 @@ def savefig(func_name, P, S):
 
 
 if __name__=="__main__":
-    functions_to_learn = [f28, f7, f3, f1, f5, f27, f9, f21, f25, f23]
+    functions_to_learn = [f2, f4, f6, f8, f22]
     # functions_to_learn = [f1]
-    actions_P = [-3, -1, 0, 1, 3]
+    actions_P = [-1, 0, 1, 2, 3]
     actions_M = [-0.1, -0.05, 0, 0.05, 0.1]
     p_size = 30
     Q = learn(functions_to_learn, actions_P, actions_M, p_size)
@@ -90,8 +92,8 @@ if __name__=="__main__":
         try:
             func = input("Nazwa funkcji, np. f1: ")
             f = eval(func)
+            P, S = test(Q, f)
+            savefig(func, P, S)
+            print(find_extremum(Q, f))
         except Exception:
-            continue
-        P, S = test(Q, f)
-        savefig(func, P, S)
-        print(find_extremum(Q, f))
+            pass

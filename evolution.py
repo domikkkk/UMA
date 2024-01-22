@@ -1,4 +1,5 @@
 #Autor: Dominik Sidorczuk, Tomasz Sroka
+
 import numpy as np
 import scipy.spatial as ssp
 

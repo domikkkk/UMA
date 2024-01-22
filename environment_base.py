@@ -1,3 +1,5 @@
+#Autor: Dominik Sidorczuk, Tomasz Sroka
+
 import abc
 
 class Environment(abc.ABC):
